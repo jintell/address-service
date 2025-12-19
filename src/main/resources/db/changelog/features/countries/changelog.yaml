@@ -1,0 +1,85 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0001-create-countries
+      author: platform
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: countries
+      changes:
+        - createTable:
+            tableName: countries
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: iso_alpha2
+                  type: varchar(2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: iso_alpha3
+                  type: varchar(3)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: capital
+                  type: varchar(100)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: dialing_code
+                  type: varchar(3)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: flag
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: continent_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+              - column:
+                  name: created_on
+                  type: TIMESTAMPTZ
+                  constraints:
+                    nullable: true
+              - column:
+                  name: updated_on
+                  type: TIMESTAMPTZ
+                  constraints:
+                    nullable: true
+        - addUniqueConstraint:
+            tableName: countries
+            columnNames: name
+            constraintName: uq_countries_name
+        - addForeignKeyConstraint:
+            baseTableName: countries
+            baseColumnNames: continent_id
+            referencedTableName: continents
+            referencedColumnNames: id
+            constraintName: fk_countries_continent
+            onDelete: SET NULL
+            onUpdate: CASCADE
+        - addUniqueConstraint:
+            tableName: countries
+            columnNames: iso_alpha2
+            constraintName: uq_countries_iso_alpha2
+        - addUniqueConstraint:
+            tableName: countries
+            columnNames: iso_alpha3
+            constraintName: uq_countries_iso_alpha3

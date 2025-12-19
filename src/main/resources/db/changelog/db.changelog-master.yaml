@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - property:
+      name: logicalFilePath
+      value: db/changelog/db.changelog-master.yaml
+  # Include per-slice changelogs here as they are created
+  - include:
+      file: db/changelog/features/continents/changelog.yaml
+  - include:
+      file: db/changelog/features/countries/changelog.yaml
+  - include:
+      file: db/changelog/features/states/changelog.yaml
+  - include:
+      file: db/changelog/features/lgas/changelog.yaml

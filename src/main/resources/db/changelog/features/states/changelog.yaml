@@ -1,0 +1,62 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0001-create-states
+      author: platform
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: states
+      changes:
+        - createTable:
+            tableName: states
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: code
+                  type: varchar(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: postal_code
+                  type: varchar(20)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: country_code
+                  type: char(2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_on
+                  type: TIMESTAMPTZ
+                  constraints:
+                    nullable: true
+              - column:
+                  name: updated_on
+                  type: TIMESTAMPTZ
+                  constraints:
+                    nullable: true
+        - addUniqueConstraint:
+            tableName: states
+            columnNames: code, country_code
+            constraintName: uq_states_code_country
+        - addForeignKeyConstraint:
+            baseTableName: states
+            baseColumnNames: country_code
+            referencedTableName: countries
+            referencedColumnNames: iso_alpha2
+            constraintName: fk_states_country_code
+            onDelete: SET NULL
+            onUpdate: CASCADE

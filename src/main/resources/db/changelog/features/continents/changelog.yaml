@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0001-create-continents
+      author: platform
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: continents
+      changes:
+        - createTable:
+            tableName: continents
+            columns:
+              - column:
+                  name: id
+                  type: SERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_on
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: true
+              - column:
+                  name: updated_on
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: true
+        - addUniqueConstraint:
+            tableName: continents
+            columnNames: name
+            constraintName: uq_continents_name

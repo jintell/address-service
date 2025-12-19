@@ -1,0 +1,72 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0001-create-local_government_areas
+      author: platform
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: local_government_areas
+      changes:
+        - createTable:
+            tableName: local_government_areas
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: slug_code
+                  type: varchar(32)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: latitude
+                  type: numeric(10, 8)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: longitude
+                  type: numeric(11, 8)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: state_code
+                  type: varchar(12)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: country_code
+                  type: char(2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_on
+                  type: TIMESTAMPTZ
+                  constraints:
+                    nullable: true
+              - column:
+                  name: updated_on
+                  type: TIMESTAMPTZ
+                  constraints:
+                    nullable: true
+        - addUniqueConstraint:
+            tableName: local_government_areas
+            columnNames: slug_code, state_code
+            constraintName: uq_local_government_areas_slug_code_state_code
+        - addForeignKeyConstraint:
+            baseTableName: local_government_areas
+            baseColumnNames: state_code, country_code
+            referencedTableName: states
+            referencedColumnNames: code, country_code
+            constraintName: fk_lga_state_code_country_code
+            onDelete: SET NULL
+            onUpdate: CASCADE

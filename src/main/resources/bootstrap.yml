@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: address-service
+  profiles:
+    active: ${SPRING_PROFILE:dev}
+  cloud:
+    config:
+      uri: http://${CONFIG_SERVER_HOST:localhost}:9088
+      enabled: true
+      fail-fast: ${CONFIG_FAIL_FAST:true}
