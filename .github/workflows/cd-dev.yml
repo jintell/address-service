@@ -142,18 +142,18 @@ jobs:
           username: ${{ secrets.EC2_DEV_USER }}
           port: 22
           source: "scripts/deploy.sh"
-          target: "~/stake-api-service-dev"
+          target: "~/app-service"
           key: ${{ secrets.EC2_DEV_SSH_KEY }}
 
-      - name: Copy deployment yaml
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.EC2_DEV_HOST }}
-          username: ${{ secrets.EC2_DEV_USER }}
-          port: 22
-          source: "./docker-compose.prod.yml"
-          target: "~/stake-api-service-dev"
-          key: ${{ secrets.EC2_DEV_SSH_KEY }}
+#      - name: Copy deployment yaml
+#        uses: appleboy/scp-action@v0.1.7
+#        with:
+#          host: ${{ secrets.EC2_DEV_HOST }}
+#          username: ${{ secrets.EC2_DEV_USER }}
+#          port: 22
+#          source: "./docker-compose.prod.yml"
+#          target: "~/app-service"
+#          key: ${{ secrets.EC2_DEV_SSH_KEY }}
 
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -164,9 +164,9 @@ jobs:
           script_stop: true
           script: |
             set -euo pipefail
-            mkdir -p ~/stake-api-service-dev
+            mkdir -p ~/app-service
             mkdir -p ~/app/logs
-            cd ~/stake-api-service-dev
+            cd ~/app-service
             chmod +x ./scripts/deploy.sh
             pwd
             echo "Logging into GHCR"
