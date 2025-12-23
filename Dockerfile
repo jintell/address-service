@@ -3,7 +3,8 @@
 FROM eclipse-temurin:21-jdk-alpine AS build
 
 # Install necessary build dependencies
-RUN apk update && apk add --no-cache bash 'libexpat>=2.7.2-r0'
+RUN apk update && apk upgrade --no-cache \
+    && apk add --no-cache bash 'libexpat>=2.7.2-r0'
 
 WORKDIR /workspace
 
@@ -26,7 +27,8 @@ RUN ./gradlew clean bootJar -x test --no-daemon
 FROM eclipse-temurin:21-jre-alpine
 
 # Install minimal runtime dependencies
-RUN apk update && apk add --no-cache 'libexpat>=2.7.2-r0' curl wget
+RUN apk update && apk upgrade --no-cache \
+    && apk add --no-cache 'libexpat>=2.7.2-r0' curl wget
 
 # Create the logs directory with -p flag
 RUN mkdir -p /app/logs
