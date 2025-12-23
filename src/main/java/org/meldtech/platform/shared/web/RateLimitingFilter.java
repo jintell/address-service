@@ -1,6 +1,8 @@
 package org.meldtech.platform.shared.web;
 
 import org.meldtech.platform.shared.config.RateLimitProperties;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
@@ -19,15 +21,23 @@ import java.nio.charset.StandardCharsets;
 public class RateLimitingFilter implements WebFilter {
 
     private final RateLimitProperties props;
-    private final RateLimiter limiter;
+    private final RedisLeakyBucketRateLimiter limiter;
 
-    public RateLimitingFilter(RateLimitProperties props, RateLimiter limiter) {
+    public RateLimitingFilter(RateLimitProperties props,
+                              ReactiveStringRedisTemplate redis) {
         this.props = props;
-        this.limiter = limiter;
+        this.limiter = new RedisLeakyBucketRateLimiter(redis, props.getKeyPrefix(), props.getCapacity(), props.getLeakPerSecond());
     }
+//    public RateLimitingFilter(RateLimitProperties props,
+//                              RateLimiter limiter) {
+//        this.props = props;
+//        this.limiter = limiter;
+//    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        System.err.println("enabled "+(props != null && props.isEnabled()));
+        System.err.println("key strategy "+props.getKeyStrategy());
         if (props == null || !props.isEnabled()) return chain.filter(exchange);
 
         String key = buildKey(exchange);

@@ -1,11 +1,10 @@
 package org.meldtech.platform.shared.web;
 
-import jakarta.validation.constraints.NotNull;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -25,6 +24,10 @@ public class RedisLeakyBucketRateLimiter implements RateLimiter {
     private final DefaultRedisScript<Long> script;
     private final Duration ttl;
 
+    private static final double MIN_LEAK_RATE = 0.001;
+    private static final long BUFFER_SECONDS = 30;
+    private static final long MIN_TTL_SECONDS = 60;
+
     public RedisLeakyBucketRateLimiter(ReactiveStringRedisTemplate redis,
                                        String keyPrefix,
                                        int capacity,
@@ -36,8 +39,9 @@ public class RedisLeakyBucketRateLimiter implements RateLimiter {
         this.script = new DefaultRedisScript<>();
         this.script.setResultType(Long.class);
         this.script.setScriptText(LUA);
+        double effectiveLeakRate = Math.max(MIN_LEAK_RATE, leakPerSecond);
         // TTL to auto-clean inactive buckets: roughly capacity/leak seconds plus a buffer
-        long seconds = Math.max(60, (long) Math.ceil((capacity / Math.max(0.001, leakPerSecond)) + 30));
+        long seconds = Math.max(MIN_TTL_SECONDS, (long) Math.ceil(capacity / effectiveLeakRate + BUFFER_SECONDS));
         this.ttl = Duration.ofSeconds(seconds);
     }
 
@@ -45,6 +49,7 @@ public class RedisLeakyBucketRateLimiter implements RateLimiter {
     public Mono<Boolean> allow(String key) {
         if (key == null || key.isBlank()) return Mono.just(true);
         String redisKey = keyPrefix + ":" + key;
+        System.err.println("redis key: " + redisKey + "");
         long nowMs = Instant.now().toEpochMilli();
         String capacityStr = Integer.toString(capacity);
         String leakPerSecStr = Double.toString(leakPerSecond);

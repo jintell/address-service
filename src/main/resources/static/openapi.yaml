@@ -1,0 +1,689 @@
+openapi: 3.1.0
+info:
+  title: Address Management Service API
+  version: 0.1.0
+  description: |
+    OpenAPI spec generated from WebFlux functional routers.
+    - Spring Boot: 3.5.x
+    - Port: 9012 (local)
+servers:
+  - url: http://localhost:9012
+    description: Local server
+
+tags:
+  - name: continents
+  - name: countries
+  - name: states
+  - name: lgas
+  - name: geocoding
+
+paths:
+  /v1/location/continents:
+    post:
+      tags: [ continents ]
+      operationId: createContinent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContinentCreateRequest'
+      responses:
+        '201':
+          description: Continent created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Continent'
+    get:
+      tags: [ continents ]
+      operationId: listContinents
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+      responses:
+        '200':
+          description: List continents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Continent'
+
+    patch:
+      tags: [ continents ]
+      operationId: patchContinent
+      parameters:
+        - $ref: '#/components/parameters/NameParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContinentPatchRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Continent'
+
+  # ===== Countries =====
+  /v1/location/countries:
+    post:
+      tags: [ countries ]
+      operationId: addCountry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CountryRegisterRequest'
+      responses:
+        '200':
+          description: Country created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountryResponse'
+
+  /v1/location/countries/{isoAlpha2}:
+    patch:
+      tags: [ countries ]
+      operationId: updateCountry
+      parameters:
+        - $ref: '#/components/parameters/IsoAlpha2'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CountryUpdateRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountryResponse'
+
+  /v1/location/countries/{continentCode}:
+    get:
+      tags: [ countries ]
+      operationId: listCountries
+      parameters:
+        - $ref: '#/components/parameters/ContinentCodeParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+      responses:
+        '200':
+          description: Countries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountryList'
+
+  /v1/location/countries/iso-2/{isoAlpha2}:
+      get:
+        tags: [ countries ]
+        operationId: getIsoAlpha2
+        parameters:
+          - $ref: '#/components/parameters/IsoAlpha2'
+        responses:
+          '200':
+            description: Country
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/CountryResponse'
+          '404': { description: Not found }
+          
+  /v1/location/countries/iso-3/{isoAlpha3}:
+      get:
+        tags: [ countries ]
+        operationId: getIsoAlpha3
+        parameters:
+          - $ref: '#/components/parameters/IsoAlpha3Param'
+        responses:
+          '200':
+            description: Country
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/CountryResponse'
+          '404': { description: Not found }
+
+  # ===== States API=====
+  /v1/location/states:
+    post:
+      tags: [ states ]
+      operationId: addState
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StateCreateRequest'
+      responses:
+        '201':
+          description: State created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/State'
+
+  /v1/location/states/country/{countryCode}:
+    get:
+      tags: [ states ]
+      operationId: listStatesByCountryCode
+      parameters:
+        - $ref: '#/components/parameters/CountryCodeParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+      responses:
+        '200':
+          description: List states
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/State'
+        '404': { description: Not found }
+
+  /v1/location/states/name/{name}:
+    get:
+      tags: [ states ]
+      operationId: listStatesByName
+      parameters:
+        - $ref: '#/components/parameters/NameParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+      responses:
+        '200':
+          description: List states
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/State'
+        '404': { description: Not found }
+
+  /v1/location/states/{code}:
+    patch:
+      tags: [ states ]
+      operationId: updateState
+      parameters:
+        - $ref: '#/components/parameters/CodeParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatePatchRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/State'
+
+  #--- Local Government Areas ---
+  /v1/location/lgas:
+    post:
+      tags: [ lgas ]
+      operationId: addLga
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LgaCreateRequest'
+      responses:
+        '201':
+          description: Lga created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lga'
+
+  /v1/location/lgas/states/{stateCode}:
+    get:
+      tags: [ lgas ]
+      operationId: listLgaByStateCode
+      parameters:
+        - $ref: '#/components/parameters/StateCodeParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+      responses:
+        '200':
+          description: List lgas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lga'
+
+  /v1/location/lgas/name/{name}:
+    get:
+      tags: [ lgas ]
+      operationId: listLgaByName
+      parameters:
+        - $ref: '#/components/parameters/NameParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+      responses:
+        '200':
+          description: List lgas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lga'
+
+  /v1/location/lgas/{slugCode}:
+    patch:
+      tags: [ lgas ]
+      operationId: updateLga
+      parameters:
+        - $ref: '#/components/parameters/SlugCodeParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LgaPatchRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lga'
+
+  #--- GeoCode API -----//
+  /v1/location/geocodes/coordinates:
+    get:
+      tags: [ geocoding ]
+      operationId: getCoordinate
+      parameters:
+        - $ref: '#/components/parameters/AddressParam'
+      responses:
+        '200':
+          description: Geocodes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeocodeList'
+  
+  /v1/location/geocodes/address:
+    get:
+      tags: [ geocoding ]
+      operationId: getAddress
+      parameters:
+        - $ref: '#/components/parameters/LatitudeParam'
+        - $ref: '#/components/parameters/LongitudeParam'
+      responses:
+        '200':
+          description: Human-readable adress from coordinates
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /v1/location/geocodes/distance:
+    get:
+      tags: [ geocoding ]
+      operationId: getCoordinatesDistance
+      parameters:
+        - $ref: '#/components/parameters/LatitudeParam'
+        - $ref: '#/components/parameters/LongitudeParam'
+        - $ref: '#/components/parameters/Latitude2Param'
+        - $ref: '#/components/parameters/Longitude2Param'
+      responses:
+        '200':
+          description: Distance Between 2 locations (coordinates)
+          content:
+            application/json:
+              schema:
+                type: number
+
+  /v1/location/geocodes/address/distance:
+    get:
+      tags: [ geocoding ]
+      operationId: getDistanceFromAddresses
+      parameters:
+        - $ref: '#/components/parameters/AddressParam'
+        - $ref: '#/components/parameters/ToAddressParam'
+      responses:
+        '200':
+          description: Distance between two addresses
+          content:
+            application/json:
+              schema:
+                type: number
+
+components:
+  parameters:
+    NameParam:
+      in: path
+      name: name
+      required: true
+      schema:
+        type: string
+      description: Resource item name (string)
+    CodeParam:
+      in: path
+      name: code
+      required: true
+      schema:
+        type: string
+      description: Resource item code (string)
+    IsoAlpha2:
+      in: path
+      name: isoAlpha2
+      required: true
+      schema:
+        type: string
+      description: Resource item isoAlpha2 (string)
+    IsoAlpha3Param:
+      in: path
+      name: isoAlpha3
+      required: true
+      schema:
+        type: string
+      description: Resource item isoAlpha3 (string)
+    ContinentCodeParam:
+      in: path
+      name: continentCode
+      required: true
+      schema:
+        type: string
+      description: Resource item continentCode (string)
+    CountryCodeParam:
+      in: path
+      name: countryCode
+      required: true
+      schema:
+        type: string
+      description: Resource item countryCode (string)
+    SlugCodeParam:
+      in: path
+      name: slugCode
+      required: true
+      schema:
+        type: string
+      description: Resource item slugCode (string)
+    StateCodeParam:
+      in: path
+      name: stateCode
+      required: true
+      schema:
+        type: string
+      description: Resource item stateCode (string)
+    PageParam:
+      in: query
+      name: page
+      required: false
+      description: Zero-based page index
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    SizeParam:
+      in: query
+      name: size
+      required: false
+      description: Page size (items per page)
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+    AddressParam:
+      in: query
+      name: address
+      required: true
+      description: Simple Address
+      schema:
+        type: string
+    ToAddressParam:
+      in: query
+      name: to-address
+      required: true
+      description: Simple Address
+      schema:
+        type: string
+    LatitudeParam:
+      in: query
+      name: latitude
+      required: true
+      schema:
+        type: number
+        example: 52.5173885
+    LongitudeParam:
+      in: query
+      name: longitude
+      required: true
+      schema:
+        type: number
+        example: 13.3951309
+    Latitude2Param:
+      in: query
+      name: latitude1
+      required: true
+      schema:
+        type: number
+        example: 52.5173885
+    Longitude2Param:
+      in: query
+      name: longitude1
+      required: true
+      schema:
+        type: number
+        example: 13.3951309
+
+
+  schemas:
+    # ===== Known Billing DTOs from code =====
+    # ===== Countries DTOs (from features.countries.api.CountryDto) =====
+    CountryResponse:
+      type: object
+      required: [ name, isoAlpha2, isoAlpha3, capital, dialingCode, flag, continentCode ]
+      properties:
+        name:
+          type: string
+        isoAlpha2:
+          type: string
+        isoAlpha3:
+          type: string
+        capital:
+          type: string
+        dialingCode:
+          type: string
+        flag:
+          type: string
+        continentCode:
+          type: number
+        createdOn:
+          type: string
+          format: datetime
+
+    CountryRegisterRequest:
+      type: object
+      required: [ name, isoAlpha2, isoAlpha3, capital, continentCode ]
+      properties:
+        name:
+          type: string
+        isoAlpha2:
+          type: string
+        isoAlpha3:
+          type: string
+        capital:
+          type: string
+        dialingCode:
+          type: string
+        flag:
+          type: string
+        continentCode:
+          type: number
+
+    CountryUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        isoAlpha2:
+          type: string
+        isoAlpha3:
+          type: string
+        capital:
+          type: string
+        dialingCode:
+          type: string
+        flag:
+          type: string
+        continentCode:
+          type: number
+
+    CountryList:
+      type: array
+      items: { $ref: '#/components/schemas/CountryResponse' }
+
+    # ===== Placeholders for other slices (to refine) =====
+    Continent:
+      type: object
+      properties:
+        name:
+          type: string
+        createdOn:
+          type: string
+          format: datetime
+
+    ContinentCreateRequest:
+      type: object
+      required: [ name ]
+      properties:
+        name:
+          type: string
+          example: Africa
+
+    ContinentPatchRequest:
+      type: object
+      required: [ name ]
+      properties:
+        name:
+          type: string
+          example: Africa
+
+    State:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        active:
+          type: boolean
+
+    StateCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        code:
+          type: string
+        postalCode:
+          type: string
+        countryCode:
+          type: string
+        createdOn:
+          type: string
+          format: datetime
+
+    StatePatchRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        code:
+          type: string
+        postalCode:
+          type: string
+        countryCode:
+          type: string
+
+    Lga:
+      type: object
+      properties:
+        name:
+          type: string
+        slugCode:
+          type: array
+        latitude:
+          type: number
+        longitude:
+          type: number
+        stateCode:
+          type: string
+        countryCode:
+          type: string
+        createdOn:
+          type: string
+          format: datetime
+
+    LgaCreateRequest:
+      type: object
+      required: [ name, slugCode, stateCode, countryCode ]
+      properties:
+        name:
+          type: string
+        slugCode:
+          type: array
+        latitude:
+          type: number
+        longitude:
+          type: number
+        stateCode:
+          type: string
+        countryCode:
+          type: string
+
+    LgaPatchRequest:
+      type: object
+      required: [ name, slugCode, stateCode, countryCode ]
+      properties:
+        name:
+          type: string
+        slugCode:
+          type: array
+        latitude:
+          type: number
+        longitude:
+          type: number
+        stateCode:
+          type: string
+        countryCode:
+          type: string
+
+    GeocodeList:
+      type: object
+      properties:
+        displayName:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type:  number
+        addressType:
+          type: string

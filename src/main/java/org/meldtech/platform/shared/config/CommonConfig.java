@@ -1,5 +1,6 @@
 package org.meldtech.platform.shared.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.beans.factory.config.CustomScopeConfigurer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -15,7 +16,7 @@ import org.springframework.web.context.request.RequestScope;
  * Shared configuration toggles and common beans can be declared here as the system evolves.
  */
 @Configuration
-@EnableConfigurationProperties({ RateLimitProperties.class  })
+@EnableConfigurationProperties({ RateLimitProperties.class, GeoCodingProperties.class  })
 public class CommonConfig {
 
     // Ensure ISO-8601 for Java time types in JSON (no numeric timestamps)
