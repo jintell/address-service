@@ -77,6 +77,7 @@ public class ContinentService {
 
     private ContinentResponse toResponse(ContinentEntity entity) {
         return new ContinentResponse(
+                entity.id(),
                 entity.name(),
                 entity.createdOn() );
     }

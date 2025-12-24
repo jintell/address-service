@@ -7,6 +7,6 @@ import java.time.Instant;
 @NoArgsConstructor
 public final class ContinentDto {
 
-    public record ContinentResponse(String name, Instant createdOn) { }
+    public record ContinentResponse(Long id, String name, Instant createdOn) { }
     public record ContinentRequest(String name) { }
 }
