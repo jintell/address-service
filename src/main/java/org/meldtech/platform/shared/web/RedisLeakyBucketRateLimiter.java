@@ -49,7 +49,6 @@ public class RedisLeakyBucketRateLimiter implements RateLimiter {
     public Mono<Boolean> allow(String key) {
         if (key == null || key.isBlank()) return Mono.just(true);
         String redisKey = keyPrefix + ":" + key;
-        System.err.println("redis key: " + redisKey + "");
         long nowMs = Instant.now().toEpochMilli();
         String capacityStr = Integer.toString(capacity);
         String leakPerSecStr = Double.toString(leakPerSecond);

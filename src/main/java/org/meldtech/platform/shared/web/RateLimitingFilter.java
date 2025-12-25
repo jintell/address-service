@@ -28,16 +28,9 @@ public class RateLimitingFilter implements WebFilter {
         this.props = props;
         this.limiter = new RedisLeakyBucketRateLimiter(redis, props.getKeyPrefix(), props.getCapacity(), props.getLeakPerSecond());
     }
-//    public RateLimitingFilter(RateLimitProperties props,
-//                              RateLimiter limiter) {
-//        this.props = props;
-//        this.limiter = limiter;
-//    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        System.err.println("enabled "+(props != null && props.isEnabled()));
-        System.err.println("key strategy "+props.getKeyStrategy());
         if (props == null || !props.isEnabled()) return chain.filter(exchange);
 
         String key = buildKey(exchange);
