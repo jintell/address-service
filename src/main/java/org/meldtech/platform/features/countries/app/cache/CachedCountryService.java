@@ -30,6 +30,7 @@ public class CachedCountryService {
     private final CountryService delegate;
 
     // Build more specific cache keys based on pagination parameters
+    private static final String CACHE_KEY_BY_ALL = "countries:page:%d:size:%d";
     private static final String CACHE_KEY_BY_CONTINENT = "country:continent:%d:page:%d:size:%d";
     private static final String CACHE_KEY_BY_ISO2 = "country:iso2:%s";
     private static final String CACHE_KEY_BY_ISO3= "country:iso3:%s";
@@ -78,6 +79,17 @@ public class CachedCountryService {
         return listCache.get(
                         cacheKey,
                         delegate.getAllByContinentId(continentId, page, size).collectList().map(listCache::flatten),
+                        COUNTRY_LIST_CACHE_TTL
+                ).flatMapMany(this::rebuildResponse);
+    }
+
+    public Flux<CountryDto.CountryResponse> getAll(int page, int size) {
+        log.debug("Getting Countries ");
+        String cacheKey = String.format(CACHE_KEY_BY_ALL, page, size);
+
+        return listCache.get(
+                        cacheKey,
+                        delegate.getAll(page, size).collectList().map(listCache::flatten),
                         COUNTRY_LIST_CACHE_TTL
                 ).flatMapMany(this::rebuildResponse);
     }

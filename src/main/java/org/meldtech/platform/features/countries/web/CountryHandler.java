@@ -34,6 +34,11 @@ public class CountryHandler {
                 .flatMap(Responses::ok);
     }
 
+    public Mono<ServerResponse> list(ServerRequest request) {
+        var p = Pagination.from(request);
+        return Responses.paginated(request, cacheService.getAll(p.page(), p.size()), service.count());
+    }
+
     public Mono<ServerResponse> listCountries(ServerRequest request) {
         long continentCode = Long.parseLong(request.pathVariable("continentCode"));
         var p = Pagination.from(request);

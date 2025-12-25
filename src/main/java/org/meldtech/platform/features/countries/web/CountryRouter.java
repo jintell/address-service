@@ -21,6 +21,7 @@ public class CountryRouter {
                         .and(contentType(MediaType.APPLICATION_JSON)), handler::addCountry)
                 .PATCH(base + "/{isoAlpha2}", accept(MediaType.APPLICATION_JSON)
                         .and(contentType(MediaType.APPLICATION_JSON)), handler::updateCountry)
+                .GET(base, handler::list)
                 .GET(base + "/{continentCode}", handler::listCountries)
                 .GET(base + "/iso-2/{isoAlpha2}", handler::getIsoAlpha2)
                 .GET(base + "/iso-3/{isoAlpha3}", handler::getIsoAlpha3)

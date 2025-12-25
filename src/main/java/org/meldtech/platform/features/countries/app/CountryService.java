@@ -8,6 +8,7 @@ import org.meldtech.platform.shared.web.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -42,13 +43,24 @@ public class CountryService {
     }
 
     public Flux<CountryResponse> getAllByContinentId(long continentId, int page, int size) {
+        logger.debug("Finding countries by continent id with: page: {}, size: {}", page, size);
+
+        int p = Math.max(page, 0);
+        int s = Math.max(size, 1);
+        var pageable = PageRequest.of(p, s, Sort.by("name").ascending());
+
+        return countryRepository.findByContinentId(continentId, pageable)
+                .map(this::toResponse);
+    }
+
+    public Flux<CountryResponse> getAll(int page, int size) {
         logger.debug("Finding countries with: page: {}, size: {}", page, size);
 
         int p = Math.max(page, 0);
         int s = Math.max(size, 1);
-        var pageable = PageRequest.of(p, s);
+        var pageable = PageRequest.of(p, s, Sort.by("name").ascending());
 
-        return countryRepository.findByContinentId(continentId, pageable)
+        return countryRepository.findAllBy(pageable)
                 .map(this::toResponse);
     }
 
